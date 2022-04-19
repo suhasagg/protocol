@@ -3,10 +3,10 @@ import { TestableStrategy, FoldTestDefault } from "./../strategy-test-case";
 
 
 const tests = [
-    // {
-    //   name: "BenqiUsdcE",
-    //   controller: "optimizer"
-    // },
+    {
+      name: "BenqiUsdcE",
+      controller: "optimizer"
+    },
     // {
     //   name: "BenqiLinkE",
     //   controller: "optimizer"
@@ -48,16 +48,16 @@ const tests = [
     //     name: "BenqiDaiE",
     //     controller:"optimizer"
     // },
-    {
-        name: "BenqiUsdt",
-        controller: "benqi",
-        slot: 51
-    },
-    {
-        name: "BenqiUsdc",
-        controller: "benqi",
-        slot: 9
-    },
+    // {
+    //     name: "BenqiUsdt",
+    //     controller: "benqi",
+    //     slot: 51
+    // },
+    // {
+    //     name: "BenqiUsdc",
+    //     controller: "optimizer",
+    //     slot: 9
+    // },
  
 ];
 

@@ -1,11 +1,9 @@
 const {exec} = require('child_process');
 
 async function main() {
-  const platform = "pangolin";
+  const platform = "benqi";
   const names = [
-    "png-avax-ustw",
-    "png-usdc-ustw",
-    "png-ustw-png"
+    "benqi-usdce"
   ];
 
   const flatten = name => {

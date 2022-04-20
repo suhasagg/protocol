@@ -14,11 +14,12 @@ const tests = [
     //     controller: "backup",
     //     lp_suffix: false,
     // },
-    // {
-    //     name: "JoeAvaxPtp",
-    //     controller: "backup",
-    //     lp_suffix: false,
-    // },
+    {
+        name: "JoeAvaxPtp",
+        controller: "traderJoe",
+        lp_suffix: false,
+        slot: 1
+    },
     // {
     //     name: "JoeAvaxPln",
     //     controller: "backup",
@@ -205,11 +206,11 @@ const tests = [
     //     controller: "traderJoe",
     //     slot: 1
     // },
-    {
-        name: "JoeAvaxLost",
-        controller: "traderJoe",
-        slot: 1
-    }
+    // {
+    //     name: "JoeAvaxLost",
+    //     controller: "traderJoe",
+    //     slot: 1
+    // }
 ];
 
 describe("TraderJoe LP test", function() {

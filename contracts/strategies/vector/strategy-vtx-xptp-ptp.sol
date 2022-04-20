@@ -2,7 +2,9 @@
 pragma solidity ^0.6.7;
 import "../bases/strategy-vtx-farm-base-lp.sol";
 
-contract StrategyVtxxPtpPtp is StrategyVtxLPFarmBase{
+///@notice Vector's PTP/xPTP liquidity pool strategy with VTX rewards
+contract StrategyVtxPtpxPtp is StrategyVtxLPFarmBase{
+    // Token and contract addresses
     address public xptp_ptp = 0xC4B7121b4FC065dECd26C33FB32e42C543E8850d;
     address public xptp_ptp_staking = 0x423D0FE33031aA4456a17b150804aA57fc157d97; 
 
@@ -22,56 +24,36 @@ contract StrategyVtxxPtpPtp is StrategyVtxLPFarmBase{
         _controller,
         _timelock
     )
-       
     {}
 
     // **** State Mutations ****
+    ///@notice Swap rewards to PTP, take fee, then swap half PTP for xPTP and add liquidity 
     function harvest() public override onlyBenevolent {
         // Collects Reward tokens
         IMasterChefVTX(xptp_ptp_staking).deposit(xptp_ptp, 0);
 
-        // Take Avax Rewards    
+        // Take AVAX Rewards    
         uint256 _avax = address(this).balance;                   // get balance of native Avax
         if (_avax > 0) {                                         // wrap avax into ERC20
             WAVAX(wavax).deposit{value: _avax}();
         }
 
         uint256 _vtx = IERC20(vtx).balanceOf(address(this));      // get balance of VTX Tokens
-        uint256 _ptp = IERC20(ptp).balanceOf(address(this));      //get balance of PTP Tokens
         uint256 _wavax = IERC20(wavax).balanceOf(address(this));  // get balance of AVAX Tokens
-
+        
         // In the case of VTX Rewards, swap half for VTX for xPTP and half for PTP 
-        if (_vtx > 0) {
-            uint256 _keep = _vtx.mul(keep).div(keepMax);
-            if (_keep > 0){
-                _takeFeeRewardToSnob(_keep, vtx);
-            }
-            _vtx = IERC20(vtx).balanceOf(address(this));
-
-            IERC20(vtx).safeApprove(joeRouter, 0);
-            IERC20(vtx).safeApprove(joeRouter, _vtx);   
-            _swapTraderJoe(vtx, xptp, _vtx.div(2)); 
-            _swapTraderJoe(vtx, ptp, _vtx.div(2)); 
+        if (_vtx > 0) {   
+            _swapTraderJoe(vtx, ptp, _vtx); 
         }
 
         // In the case of AVAX Rewards, swap half for VTX and half for PTP 
         if (_wavax > 0) {
-            uint256 _keep = _wavax.mul(keep).div(keepMax);
-            if (_keep > 0){
-                _takeFeeRewardToSnob(_keep, wavax);
-            }
-            _wavax = IERC20(wavax).balanceOf(address(this));
-
-            IERC20(wavax).safeApprove(joeRouter, 0);
-            IERC20(wavax).safeApprove(joeRouter, _wavax);   
-            _swapTraderJoe(wavax, xptp, _wavax.div(2)); 
-            _swapTraderJoe(wavax, ptp, _wavax.div(2)); 
+            _swapTraderJoe(wavax, ptp, _wavax); 
         }
         
-        // In the case of PTP Rewards, swap half PTP for xPTP and half for PTP
-        _ptp = IERC20(ptp).balanceOf(address(this));
+        // Take fee, recheck PTP balance, and swap half PTP for xPTP
+        uint256 _ptp = IERC20(ptp).balanceOf(address(this));
         if (_ptp > 0) {
-            // 10% is sent to treasury
             uint256 _keep = _ptp.mul(keep).div(keepMax);
             if (_keep > 0) {
                 _takeFeeRewardToSnob(_keep, ptp);
@@ -79,13 +61,16 @@ contract StrategyVtxxPtpPtp is StrategyVtxLPFarmBase{
 
             _ptp = IERC20(ptp).balanceOf(address(this));
 
-            IERC20(ptp).safeApprove(joeRouter, 0);
-            IERC20(ptp).safeApprove(joeRouter, _ptp);
+            address[] memory path = new address[](2);
+            path[0] = ptp;
+            path[1] = xptp;
 
-            _swapTraderJoe(ptp, xptp, _ptp.div(2));
+            IERC20(ptp).safeApprove(joeRouter, 0);
+            IERC20(ptp).safeApprove(joeRouter, _ptp.div(2));
+            _swapTraderJoeWithPath(path, _ptp.div(2));
         }
 
-        // Adds in liquidity for xPTP/PTP
+        // Add liquidity for PTP/xPTP
         uint256 _xptp = IERC20(xptp).balanceOf(address(this));
         _ptp = IERC20(ptp).balanceOf(address(this));
         if (_xptp > 0 && _ptp > 0) {
@@ -139,12 +124,12 @@ contract StrategyVtxxPtpPtp is StrategyVtxLPFarmBase{
                 );
             }  
         }
-
         _distributePerformanceFeesAndDeposit();
     }
     
     // **** Views ****
+    ///@notice Return the strategy name
     function getName() external override pure returns (string memory) {
-        return "StrategyVtxxPtpPtp";
+        return "StrategyVtxPtpxPtp";
     }
 }

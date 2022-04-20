@@ -40,23 +40,23 @@ const tests = [
     //     timelockIsStrategist: true,
     //     slot: 1
     // },
-    // {
-    //     name: "VtxxPtpPtp",
-    //     controller: "vector",
-    //     timelockIsStrategist: true,
-    //     slot: 1
-    // },
+    {
+        name: "VtxPtpxPtp",
+        controller: "vector",
+        timelockIsStrategist: false,
+        slot: 1
+    },
     // {
     //     // ptp to xptp is not reversible
     //     name: "VtxPtp",
     //     controller: "vector",
     //     slot: 4
     // }, 
-    {
-        name: "VtxVtx",
-        controller: "vector",
-        slot: 0
-    }, 
+    // {
+    //     name: "VtxVtx",
+    //     controller: "vector",
+    //     slot: 0
+    // }, 
 ];
 
 describe("Vector LP test", function() {

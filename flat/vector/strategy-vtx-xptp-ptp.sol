@@ -167,7 +167,7 @@ library SafeMath {
 
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.6.0;
+// pragma solidity ^0.6.0;
 
 /*
  * @dev Provides information about the current execution context, including the
@@ -197,7 +197,7 @@ abstract contract Context {
 
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.6.0;
+// pragma solidity ^0.6.0;
 
 
 // File: contracts/token/ERC20/IERC20.sol
@@ -791,7 +791,7 @@ library SafeERC20 {
 // File contracts/interfaces/globe.sol
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.2;
+// pragma solidity ^0.6.2;
 
 interface IGlobe is IERC20 {
     function token() external view returns (address);
@@ -817,7 +817,7 @@ interface IGlobe is IERC20 {
 // File contracts/interfaces/staking-rewards.sol
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.2;
+// pragma solidity ^0.6.2;
 
 interface IStakingRewards {
     function balanceOf(address account) external view returns (uint256);
@@ -902,7 +902,7 @@ interface IStakingRewardsFactory {
 // File contracts/interfaces/icequeen.sol
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.7;
+// pragma solidity ^0.6.7;
 
 interface IIcequeen {
     function BONUS_MULTIPLIER() external view returns (uint256);
@@ -989,10 +989,18 @@ interface IIcequeen {
 // File contracts/interfaces/joe.sol
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.2;
+// pragma solidity ^0.6.2;
 
 interface IJoeRouter {
 
+    ///@param tokenA is the first token in the lp
+    ///@param tokenB is the second token in the lp
+    ///@param amountADesired is the amount of token A to be deposited in the lp
+    ///@param amountBDesired is the amount of token B to be deposited in the lp
+    ///@param amountAMin is the minimum amount of token A we expect to be deposited in the lp
+    ///@param amountBMin is the minimum amount of token B we expect to be deposited in the lp
+    ///@param to address we're depositing to
+    ///@param deadline the timeout length of the addLiquidity call
     function addLiquidity(
         address tokenA,
         address tokenB,
@@ -1221,7 +1229,7 @@ interface IJoeFactory {
 
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.6.0;
+// pragma solidity ^0.6.0;
 
 interface IController {
     function globes(address) external view returns (address);
@@ -1259,7 +1267,7 @@ interface IController {
 // File contracts/strategies/strategy-joe-base.sol
 
 // SPDX-License-Identifier: MIT	
-pragma solidity ^0.6.7;
+// pragma solidity ^0.6.7;
 
 
 
@@ -1601,7 +1609,6 @@ abstract contract StrategyJoeBase {
         );
     }
         
-
     function _takeFeeJoeToSnob(uint256 _keep) internal {
         address[] memory path = new address[](3);
         path[0] = joe;
@@ -1663,22 +1670,22 @@ abstract contract StrategyJoeBase {
 // File contracts/interfaces/vtx.sol
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.7;
+// pragma solidity ^0.6.7;
 
-interface IPoolHelper{
-     function deposit(uint256 amount) external;
+interface IPoolHelper {
+    function deposit(uint256 amount) external;
 
-     function balance(address _address) external view returns (uint256); 
+    function balance(address _address) external view returns (uint256); 
 
-     function withdraw(uint256 amount, uint256 minAmount) external; 
+    function withdraw(uint256 amount, uint256 minAmount) external; 
 
-     function earned(address token) external view returns (uint256 vtxAmount, uint256 tokenAmount); 
+    function earned(address token) external view returns (uint256 vtxAmount, uint256 tokenAmount); 
 
-     function getReward() external; 
+    function getReward() external; 
 
-     function pendingPTP() external view returns (uint256 pendingTokens);
+    function pendingPTP() external view returns (uint256 pendingTokens);
 
-     function depositTokenBalance() external view returns (uint256);
+    function depositTokenBalance() external view returns (uint256);
 }
 
 interface IMasterChefVTX {
@@ -1809,12 +1816,16 @@ interface IBaseRewardPool {
     ) external returns (bool);
 }
 
+interface IxPTP {
+     function deposit(uint256 _amount) external;
+}
+
 
 // File contracts/interfaces/wavax.sol
 
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.6.0;
+// pragma solidity ^0.6.0;
 
 interface WAVAX {
     function name() external view returns (string memory);
@@ -1848,10 +1859,11 @@ interface WAVAX {
 // File contracts/strategies/bases/strategy-vtx-farm-base-lp.sol
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.7;
+// pragma solidity ^0.6.7;
 
 
 
+/// @notice This is a base contract for Vector staking
 abstract contract StrategyVtxLPFarmBase is StrategyJoeBase {
     // Token addresses 
     address public constant vtx = 0x5817D4F0b62A59b17f75207DA1848C2cE75e7AF4;
@@ -1878,14 +1890,15 @@ abstract contract StrategyVtxLPFarmBase is StrategyJoeBase {
         staking = _staking;
     }
 
+    /// @notice returns the balance of the want token being staked
     function balanceOfPool() public view override returns (uint256) { 
         return IMasterChefVTX(staking).depositInfo(want, address(this));
     }
 
-    // returns earned VTX and the input token ready for harvest
+    /// @notice returns earned VTX and the input token ready for harvest
     function getHarvestable() external view returns (uint256, uint256) {
-       (uint256 pendingVTX, , ,uint256 pendingPTP) = IMasterChefVTX(staking).pendingTokens(want, address(this), ptp);
-       return (pendingVTX, pendingPTP);
+        (uint256 pendingVTX, , ,uint256 pendingPTP) = IMasterChefVTX(staking).pendingTokens(want, address(this), ptp);
+        return (pendingVTX, pendingPTP);
     }
 
     // **** Setters ****
@@ -1899,6 +1912,7 @@ abstract contract StrategyVtxLPFarmBase is StrategyJoeBase {
         }
     }
 
+    /// @notice withdraws some amount from MasterChef
     function _withdrawSome(uint256 _amount)
         internal
         override
@@ -1908,6 +1922,7 @@ abstract contract StrategyVtxLPFarmBase is StrategyJoeBase {
         return _amount;
     }
 
+    /// @notice takes a fee from any reward token to snob
     function _takeFeeRewardToSnob(uint256 _keep, address reward) internal {
         IERC20(reward).safeApprove(joeRouter, 0);
         IERC20(reward).safeApprove(joeRouter, _keep);
@@ -1935,9 +1950,11 @@ abstract contract StrategyVtxLPFarmBase is StrategyJoeBase {
 // File contracts/strategies/vector/strategy-vtx-xptp-ptp.sol
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.7;
+// pragma solidity ^0.6.7;
 
-contract StrategyVtxxPtpPtp is StrategyVtxLPFarmBase{
+///@notice Vector's PTP/xPTP liquidity pool strategy with VTX rewards
+contract StrategyVtxPtpxPtp is StrategyVtxLPFarmBase{
+    // Token and contract addresses
     address public xptp_ptp = 0xC4B7121b4FC065dECd26C33FB32e42C543E8850d;
     address public xptp_ptp_staking = 0x423D0FE33031aA4456a17b150804aA57fc157d97; 
 
@@ -1957,56 +1974,36 @@ contract StrategyVtxxPtpPtp is StrategyVtxLPFarmBase{
         _controller,
         _timelock
     )
-       
     {}
 
     // **** State Mutations ****
+    ///@notice Swap rewards to PTP, take fee, then swap half PTP for xPTP and add liquidity 
     function harvest() public override onlyBenevolent {
-         // Collects Reward tokens
+        // Collects Reward tokens
         IMasterChefVTX(xptp_ptp_staking).deposit(xptp_ptp, 0);
 
-        // Take Avax Rewards    
+        // Take AVAX Rewards    
         uint256 _avax = address(this).balance;                   // get balance of native Avax
         if (_avax > 0) {                                         // wrap avax into ERC20
             WAVAX(wavax).deposit{value: _avax}();
         }
 
         uint256 _vtx = IERC20(vtx).balanceOf(address(this));      // get balance of VTX Tokens
-        uint256 _ptp = IERC20(ptp).balanceOf(address(this));      //get balance of PTP Tokens
         uint256 _wavax = IERC20(wavax).balanceOf(address(this));  // get balance of AVAX Tokens
-
-       // In the case of VTX Rewards, swap half for VTX for xPTP and half for PTP 
-        if (_vtx > 0) {
-            uint256 _keep = _vtx.mul(keep).div(keepMax);
-            if (_keep > 0){
-                _takeFeeRewardToSnob(_keep, vtx);
-            }
-            _vtx = IERC20(vtx).balanceOf(address(this));
-
-            IERC20(vtx).safeApprove(joeRouter, 0);
-            IERC20(vtx).safeApprove(joeRouter, _vtx);   
-            _swapTraderJoe(vtx, xptp, _vtx.div(2)); 
-            _swapTraderJoe(vtx, ptp, _vtx.div(2)); 
+        
+        // In the case of VTX Rewards, swap half for VTX for xPTP and half for PTP 
+        if (_vtx > 0) {   
+            _swapTraderJoe(vtx, ptp, _vtx); 
         }
 
         // In the case of AVAX Rewards, swap half for VTX and half for PTP 
         if (_wavax > 0) {
-            uint256 _keep = _wavax.mul(keep).div(keepMax);
-            if (_keep > 0){
-                _takeFeeRewardToSnob(_keep, wavax);
-            }
-            _wavax = IERC20(wavax).balanceOf(address(this));
-
-            IERC20(wavax).safeApprove(joeRouter, 0);
-            IERC20(wavax).safeApprove(joeRouter, _wavax);   
-            _swapTraderJoe(wavax, xptp, _wavax.div(2)); 
-            _swapTraderJoe(wavax, ptp, _wavax.div(2)); 
+            _swapTraderJoe(wavax, ptp, _wavax); 
         }
         
-        // In the case of PTP Rewards, swap half PTP for xPTP and half for PTP
-        _ptp = IERC20(ptp).balanceOf(address(this));
+        // Take fee, recheck PTP balance, and swap half PTP for xPTP
+        uint256 _ptp = IERC20(ptp).balanceOf(address(this));
         if (_ptp > 0) {
-            // 10% is sent to treasury
             uint256 _keep = _ptp.mul(keep).div(keepMax);
             if (_keep > 0) {
                 _takeFeeRewardToSnob(_keep, ptp);
@@ -2014,13 +2011,16 @@ contract StrategyVtxxPtpPtp is StrategyVtxLPFarmBase{
 
             _ptp = IERC20(ptp).balanceOf(address(this));
 
-            IERC20(ptp).safeApprove(joeRouter, 0);
-            IERC20(ptp).safeApprove(joeRouter, _ptp);
+            address[] memory path = new address[](2);
+            path[0] = ptp;
+            path[1] = xptp;
 
-            _swapTraderJoe(ptp, xptp, _ptp.div(2));
+            IERC20(ptp).safeApprove(joeRouter, 0);
+            IERC20(ptp).safeApprove(joeRouter, _ptp.div(2));
+            _swapTraderJoeWithPath(path, _ptp.div(2));
         }
 
-        // Adds in liquidity for xPTP/PTP
+        // Add liquidity for PTP/xPTP
         uint256 _xptp = IERC20(xptp).balanceOf(address(this));
         _ptp = IERC20(ptp).balanceOf(address(this));
         if (_xptp > 0 && _ptp > 0) {
@@ -2078,8 +2078,8 @@ contract StrategyVtxxPtpPtp is StrategyVtxLPFarmBase{
     }
     
     // **** Views ****
-
+    ///@notice Return the strategy name
     function getName() external override pure returns (string memory) {
-        return "StrategyVtxxPtpPtp";
+        return "StrategyVtxPtpxPtp";
     }
 }

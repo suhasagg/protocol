@@ -1,4 +1,4 @@
-// Sources flattened with hardhat v2.6.8 https://hardhat.org
+// Sources flattened with hardhat v2.8.3 https://hardhat.org
 
 // File contracts/lib/safe-math.sol
 
@@ -167,7 +167,7 @@ library SafeMath {
 
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.6.0;
+// pragma solidity ^0.6.0;
 
 /*
  * @dev Provides information about the current execution context, including the
@@ -197,7 +197,7 @@ abstract contract Context {
 
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.6.0;
+// pragma solidity ^0.6.0;
 
 
 // File: contracts/token/ERC20/IERC20.sol
@@ -791,7 +791,7 @@ library SafeERC20 {
 // File contracts/interfaces/globe.sol
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.2;
+// pragma solidity ^0.6.2;
 
 interface IGlobe is IERC20 {
     function token() external view returns (address);
@@ -817,7 +817,7 @@ interface IGlobe is IERC20 {
 // File contracts/interfaces/staking-rewards.sol
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.2;
+// pragma solidity ^0.6.2;
 
 interface IStakingRewards {
     function balanceOf(address account) external view returns (uint256);
@@ -902,7 +902,7 @@ interface IStakingRewardsFactory {
 // File contracts/interfaces/icequeen.sol
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.7;
+// pragma solidity ^0.6.7;
 
 interface IIcequeen {
     function BONUS_MULTIPLIER() external view returns (uint256);
@@ -991,7 +991,7 @@ interface IIcequeen {
 // SPDX-License-Identifier: MIT
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.2;
+// pragma solidity ^0.6.2;
 
 interface IPangolinRouter {
     function swapExactTokensForTokens(
@@ -1220,7 +1220,7 @@ interface IPangolinFactory {
 
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.6.0;
+// pragma solidity ^0.6.0;
 
 interface IController {
     function globes(address) external view returns (address);
@@ -1258,7 +1258,7 @@ interface IController {
 // File contracts/strategies/strategy-base.sol
 
 // SPDX-License-Identifier: MIT	
-pragma solidity ^0.6.7;
+// pragma solidity ^0.6.7;
 
 
 
@@ -1635,7 +1635,7 @@ abstract contract StrategyBase {
 // File contracts/interfaces/joe-rewarder.sol
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.7;
+// pragma solidity ^0.6.7;
 
 // interface for Trader Joe Rewarder contract
 interface IJoeRewarder {
@@ -1655,14 +1655,13 @@ interface IJoeRewarder {
 // File contracts/interfaces/masterchefjoev2.sol
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.7;
+// pragma solidity ^0.6.7;
 
 // interface for MasterChefJoeV2 contract
 interface IMasterChefJoeV2 {
 
-
     /* Reads */
-    function userInfo(uint256, address) external view returns (
+    function userInfo(uint256 pid, address) external view returns (
         uint256 amount,
         uint256 rewardDebt
     );
@@ -1718,14 +1717,82 @@ interface IMasterChefJoeV2 {
     ) external;
 }
 
+// interface for MasterChefJoe contracts
+interface IMasterChefJoe {
+
+    /* Reads */
+    function userInfo(uint256 pid, address) external view returns (
+        uint256 amount,
+        uint256 rewardDebt,
+        uint256 factor
+    );
+
+    function poolInfo(uint256 pid) external view returns (
+        IERC20 lpToken, // Address of LP token contract.
+        uint256 allocPoint, // How many allocation points assigned to this poolInfo. SUSHI to distribute per block.
+        uint256 lastRewardTimestamp, // Last block timestamp that SUSHI distribution occurs.
+        uint256 accJoePerShare, // Accumulated SUSHI per share, times 1e12. See below.
+        address rewarder
+    );
+
+    function totalAllocPoint() external view returns (uint256);
+
+    function poolLength() external view returns (uint256);
+
+    function pendingTokens(uint256 _pid, address _user)
+        external
+        view
+        returns (
+            uint256 pendingJoe,
+            address bonusTokenAddress,
+            string memory bonusTokenSymbol,
+            uint256 pendingBonusToken
+        );
+
+    /* Writes */
+
+    function add(
+        uint256 _allocPoint,
+        address _lpToken,
+        address _rewarder
+    ) external;
+
+    function set(
+        uint256 _pid,
+        uint256 _allocPoint,
+        IJoeRewarder _rewarder,
+        bool overwrite
+    ) external;
+
+    function updatePool(uint256 _pid) external;
+
+    function deposit(
+        uint256 _pid,
+        uint256 _amount
+    ) external;
+
+    function withdraw(
+        uint256 _pid,
+        uint256 _amount
+    ) external;
+}
+
 
 // File contracts/interfaces/joe.sol
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.2;
+// pragma solidity ^0.6.2;
 
 interface IJoeRouter {
 
+    ///@param tokenA is the first token in the lp
+    ///@param tokenB is the second token in the lp
+    ///@param amountADesired is the amount of token A to be deposited in the lp
+    ///@param amountBDesired is the amount of token B to be deposited in the lp
+    ///@param amountAMin is the minimum amount of token A we expect to be deposited in the lp
+    ///@param amountBMin is the minimum amount of token B we expect to be deposited in the lp
+    ///@param to address we're depositing to
+    ///@param deadline the timeout length of the addLiquidity call
     function addLiquidity(
         address tokenA,
         address tokenB,
@@ -1954,7 +2021,7 @@ interface IJoeFactory {
 
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.6.0;
+// pragma solidity ^0.6.0;
 
 interface WAVAX {
     function name() external view returns (string memory);
@@ -1988,7 +2055,7 @@ interface WAVAX {
 // File contracts/strategies/strategy-joe-rush-farm-base.sol
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.7;
+// pragma solidity ^0.6.7;
 
 
 
@@ -2060,20 +2127,27 @@ abstract contract StrategyJoeRushFarmBase is StrategyBase {
         uint256 _amount
     ) internal {
         require(_to != address(0));
-
+        // Swap with TraderJoe
+        IERC20(_from).safeApprove(joeRouter, 0);
+        IERC20(_from).safeApprove(joeRouter, _amount);
         address[] memory path;
-
-        if (_from == wavax || _to == wavax) {
+        if (_from == joe || _to == joe) {
             path = new address[](2);
             path[0] = _from;
             path[1] = _to;
-        } else {
+        } 
+        else if (_from == wavax || _to == wavax) {
+            path = new address[](2);
+            path[0] = _from;
+            path[1] = _to;
+        } 
+        else {
             path = new address[](3);
             path[0] = _from;
             path[1] = wavax;
             path[2] = _to;
         }
-
+        
         IJoeRouter(joeRouter).swapExactTokensForTokens(
             _amount,
             0,
@@ -2113,46 +2187,14 @@ abstract contract StrategyJoeRushFarmBase is StrategyBase {
             _snob.sub(_share)
         );
     }
-}
 
-
-// File contracts/strategies/traderJoe/strategy-joe-avax-ptp.sol
-
-// SPDX-License-Identifier: MIT
-pragma solidity ^0.6.7;
-
-contract StrategyJoeAvaxPtp is StrategyJoeRushFarmBase {
-
-    uint256 public avax_ptp_poolId = 28;
-
-    address public joe_avax_ptp_lp = 0xCDFD91eEa657cc2701117fe9711C9a4F61FEED23;
-    address public ptp = 0x22d4002028f537599bE9f666d1c4Fa138522f9c8;
-
-
-    constructor(
-        address _governance,
-        address _strategist,
-        address _controller,
-        address _timelock
-    )
-        public
-        StrategyJoeRushFarmBase(
-            avax_ptp_poolId,
-            joe_avax_ptp_lp,
-            _governance,
-            _strategist,
-            _controller,
-            _timelock
-        )
-    {}
-
-    function _takeFeePtpToSnob(uint256 _keep) internal {
+    function _takeFeeRewardToSnob(uint256 _keep, address reward) internal {
         address[] memory path = new address[](3);
-        path[0] = ptp;
+        path[0] = reward;
         path[1] = wavax;
         path[2] = snob;
-        IERC20(ptp).safeApprove(joeRouter, 0);
-        IERC20(ptp).safeApprove(joeRouter, _keep);
+        IERC20(reward).safeApprove(joeRouter, 0);
+        IERC20(reward).safeApprove(joeRouter, _keep);
         _swapTraderJoeWithPath(path, _keep);
         uint256 _snob = IERC20(snob).balanceOf(address(this));
         uint256 _share = _snob.mul(revenueShare).div(revenueShareMax);
@@ -2166,73 +2208,100 @@ contract StrategyJoeAvaxPtp is StrategyJoeRushFarmBase {
         );
     }
 
-    // **** State Mutations ****
+    function _swapFeeToWavax(uint256 _keep, address reward) internal {
+        address[] memory path = new address[](2);
+        path[0] = reward;
+        path[1] = wavax;
+        IERC20(reward).safeApprove(joeRouter, 0);
+        IERC20(reward).safeApprove(joeRouter, _keep);
+        _swapTraderJoeWithPath(path, _keep);
+    }
 
+    function _takeFeeToSnob(uint256 _keep) internal {
+        address[] memory path = new address[](2);
+        path[0] = wavax;
+        path[1] = snob;
+        IERC20(wavax).safeApprove(joeRouter, 0);
+        IERC20(wavax).safeApprove(joeRouter, _keep);
+        _swapTraderJoe(wavax, snob, _keep);
+        uint256 _snob = IERC20(snob).balanceOf(address(this));
+        uint256 _share = _snob.mul(revenueShare).div(revenueShareMax);
+        IERC20(snob).safeTransfer(feeDistributor, _share);
+        IERC20(snob).safeTransfer(
+        IController(controller).treasury(),
+        _snob.sub(_share));
+    }
+}
+
+
+// File contracts/strategies/traderJoe/strategy-joe-avax-ptp.sol
+
+// SPDX-License-Identifier: MIT
+// pragma solidity ^0.6.7;
+
+///@notice Trader Joe's AVAX/PTP liquidity pool strategy with JOE and PTP rewards
+contract StrategyJoeAvaxPtp is StrategyJoeRushFarmBase {
+    // Token and contract addresses
+    uint256 public lp_poolId = 28;
+
+    address public joe_avax_ptp_lp = 0xCDFD91eEa657cc2701117fe9711C9a4F61FEED23;
+    address public ptp = 0x22d4002028f537599bE9f666d1c4Fa138522f9c8;
+
+
+    constructor(
+        address _governance,
+        address _strategist,
+        address _controller,
+        address _timelock
+    )
+        public
+        StrategyJoeRushFarmBase(
+            lp_poolId,
+            joe_avax_ptp_lp,
+            _governance,
+            _strategist,
+            _controller,
+            _timelock
+        )
+    {}
+
+    // **** State Mutations ****
+    ///@notice Swap rewards to WAVAX, take fee, then swap half WAVAX for PTP and add liquidity 
     function harvest() public override onlyBenevolent {
         // Collects Joe tokens
         IMasterChefJoeV2(masterChefJoeV3).deposit(poolId, 0);
 
-        // Take Avax Rewards    
+        // Take AVAX Rewards    
         uint256 _avax = address(this).balance;              // get balance of native AVAX
         if (_avax > 0) {                                    // wrap AVAX into ERC20
             WAVAX(wavax).deposit{value: _avax}();
         }
         
-        uint256 _ptp = IERC20(ptp).balanceOf(address(this));      //get balance of PTP Tokens
-        uint256 _wavax = IERC20(wavax).balanceOf(address(this));  //get balance of WAVAX
-        if (_wavax > 0) {
-            uint256 _keep1 = _wavax.mul(keep).div(keepMax);
-            if (_keep1 > 0){
-                _takeFeeWavaxToSnob(_keep1);
-            }
-            
-            _wavax = IERC20(wavax).balanceOf(address(this));
-        }
-
+        uint256 _ptp = IERC20(ptp).balanceOf(address(this));     // get balance of PTP Tokens
          if (_ptp > 0) {
-            uint256 _keep2 = _ptp.mul(keep).div(keepMax);
-            if (_keep2 > 0){
-                _takeFeePtpToSnob(_keep2);
-            }
-            
-            _ptp = IERC20(ptp).balanceOf(address(this));
+            _swapTraderJoe(ptp, wavax, _ptp);
         }
 
-        // In the case of PTP Rewards, swap PTP for WAVAX
-        if (_ptp > 0){
-            IERC20(ptp).safeApprove(joeRouter, 0);
-            IERC20(ptp).safeApprove(joeRouter, _ptp.div(2));   
-            _swapTraderJoe(ptp, wavax, _ptp.div(2));
-        }
-
-        // In the case of AVAX Rewards, swap WAVAX for PTP
-        if (_wavax > 0){
-            IERC20(wavax).safeApprove(joeRouter, 0);
-            IERC20(wavax).safeApprove(joeRouter, _wavax.div(2));   
-            _swapTraderJoe(wavax, ptp, _wavax.div(2)); 
-        }
-
-        uint256 _joe = IERC20(joe).balanceOf(address(this));
+        uint256 _joe = IERC20(joe).balanceOf(address(this));    // get balance of JOE Tokens
         if (_joe > 0) {
-            // 10% is sent to treasury
-            uint256 _keep = _joe.mul(keep).div(keepMax);
-            if (_keep > 0) {
-                _takeFeeJoeToSnob(_keep);
-            }
-
-            _joe = IERC20(joe).balanceOf(address(this));
-
-            IERC20(joe).safeApprove(joeRouter, 0);
-            IERC20(joe).safeApprove(joeRouter, _joe);
-
-            _swapTraderJoe(joe, wavax, _joe.div(2));
-            _swapTraderJoe(joe, ptp, _joe.div(2));
+            _swapTraderJoe(joe, wavax, _joe);
         }
 
-        // Adds in liquidity for AVAX/PTP
+        // Get balance of WAVAX, take fee, swap half WAVAX for PTP
+        uint256 _wavax = IERC20(wavax).balanceOf(address(this));  
+        if (_wavax > 0) {
+            uint256 _keep = _wavax.mul(keep).div(keepMax);
+            if (_keep > 0){
+                _takeFeeWavaxToSnob(_keep);
+            }
+
+            _wavax = IERC20(wavax).balanceOf(address(this));
+            _swapTraderJoe(wavax, ptp, _wavax.div(2));
+        }
+
+        // Add liquidity for AVAX/PTP
         _wavax = IERC20(wavax).balanceOf(address(this));
         _ptp = IERC20(ptp).balanceOf(address(this));
-
         if (_wavax > 0 && _ptp > 0) {
             IERC20(wavax).safeApprove(joeRouter, 0);
             IERC20(wavax).safeApprove(joeRouter, _wavax);
@@ -2255,7 +2324,6 @@ contract StrategyJoeAvaxPtp is StrategyJoeRushFarmBase {
             _wavax = IERC20(wavax).balanceOf(address(this));
             _ptp = IERC20(ptp).balanceOf(address(this));
             _joe = IERC20(joe).balanceOf(address(this));
-
             if (_wavax > 0){
                 IERC20(wavax).transfer(
                     IController(controller).treasury(),
@@ -2276,12 +2344,11 @@ contract StrategyJoeAvaxPtp is StrategyJoeRushFarmBase {
                 );
             }  
         }
-
         _distributePerformanceFeesAndDeposit();
     }
 
     // **** Views ****
-
+    ///@notice Return the strategy name
     function getName() external override pure returns (string memory) {
         return "StrategyJoeAvaxPtp";
     }

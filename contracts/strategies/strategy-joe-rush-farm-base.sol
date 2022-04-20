@@ -73,20 +73,27 @@ abstract contract StrategyJoeRushFarmBase is StrategyBase {
         uint256 _amount
     ) internal {
         require(_to != address(0));
-
+        // Swap with TraderJoe
+        IERC20(_from).safeApprove(joeRouter, 0);
+        IERC20(_from).safeApprove(joeRouter, _amount);
         address[] memory path;
-
-        if (_from == wavax || _to == wavax) {
+        if (_from == joe || _to == joe) {
             path = new address[](2);
             path[0] = _from;
             path[1] = _to;
-        } else {
+        } 
+        else if (_from == wavax || _to == wavax) {
+            path = new address[](2);
+            path[0] = _from;
+            path[1] = _to;
+        } 
+        else {
             path = new address[](3);
             path[0] = _from;
             path[1] = wavax;
             path[2] = _to;
         }
-
+        
         IJoeRouter(joeRouter).swapExactTokensForTokens(
             _amount,
             0,

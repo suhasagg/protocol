@@ -834,7 +834,7 @@ library SafeERC20 {
 pragma solidity ^0.6.7;
 
 
-contract SnowGlobeVtxxPtpPtp is ERC20 {
+contract SnowGlobeVtxPtpxPtp is ERC20 {
     using SafeERC20 for IERC20;
     using Address for address;
     using SafeMath for uint256;

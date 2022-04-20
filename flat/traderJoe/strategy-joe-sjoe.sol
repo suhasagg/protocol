@@ -167,7 +167,7 @@ library SafeMath {
 
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.6.0;
+// pragma solidity ^0.6.0;
 
 /*
  * @dev Provides information about the current execution context, including the
@@ -197,7 +197,7 @@ abstract contract Context {
 
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.6.0;
+// pragma solidity ^0.6.0;
 
 
 // File: contracts/token/ERC20/IERC20.sol
@@ -791,7 +791,7 @@ library SafeERC20 {
 // File contracts/interfaces/globe.sol
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.2;
+// pragma solidity ^0.6.2;
 
 interface IGlobe is IERC20 {
     function token() external view returns (address);
@@ -817,7 +817,7 @@ interface IGlobe is IERC20 {
 // File contracts/interfaces/staking-rewards.sol
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.2;
+// pragma solidity ^0.6.2;
 
 interface IStakingRewards {
     function balanceOf(address account) external view returns (uint256);
@@ -902,7 +902,7 @@ interface IStakingRewardsFactory {
 // File contracts/interfaces/icequeen.sol
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.7;
+// pragma solidity ^0.6.7;
 
 interface IIcequeen {
     function BONUS_MULTIPLIER() external view returns (uint256);
@@ -989,10 +989,18 @@ interface IIcequeen {
 // File contracts/interfaces/joe.sol
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.2;
+// pragma solidity ^0.6.2;
 
 interface IJoeRouter {
 
+    ///@param tokenA is the first token in the lp
+    ///@param tokenB is the second token in the lp
+    ///@param amountADesired is the amount of token A to be deposited in the lp
+    ///@param amountBDesired is the amount of token B to be deposited in the lp
+    ///@param amountAMin is the minimum amount of token A we expect to be deposited in the lp
+    ///@param amountBMin is the minimum amount of token B we expect to be deposited in the lp
+    ///@param to address we're depositing to
+    ///@param deadline the timeout length of the addLiquidity call
     function addLiquidity(
         address tokenA,
         address tokenB,
@@ -1221,7 +1229,7 @@ interface IJoeFactory {
 
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.6.0;
+// pragma solidity ^0.6.0;
 
 interface IController {
     function globes(address) external view returns (address);
@@ -1256,10 +1264,46 @@ interface IController {
 }
 
 
+// File contracts/interfaces/wavax.sol
+
+// SPDX-License-Identifier: MIT
+
+// pragma solidity ^0.6.0;
+
+interface WAVAX {
+    function name() external view returns (string memory);
+
+    function approve(address guy, uint256 wad) external returns (bool);
+
+    function totalSupply() external view returns (uint256);
+
+    function transferFrom(
+        address src,
+        address dst,
+        uint256 wad
+    ) external returns (bool);
+
+    function withdraw(uint256 wad) external;
+
+    function decimals() external view returns (uint8);
+
+    function balanceOf(address) external view returns (uint256);
+
+    function symbol() external view returns (string memory);
+
+    function transfer(address dst, uint256 wad) external returns (bool);
+
+    function deposit() external payable;
+
+    function allowance(address, address) external view returns (uint256);
+}
+
+
 // File contracts/strategies/strategy-joe-base.sol
 
 // SPDX-License-Identifier: MIT	
-pragma solidity ^0.6.7;
+// pragma solidity ^0.6.7;
+
 
 
 
@@ -1449,6 +1493,7 @@ abstract contract StrategyJoeBase {
     function withdraw(uint256 _amount) external {
         require(msg.sender == controller, "!controller");
         uint256 _balance = IERC20(want).balanceOf(address(this));
+       
         if (_balance < _amount) {
             _amount = _withdrawSome(_amount.sub(_balance));
             _amount = _amount.add(_balance);
@@ -1467,10 +1512,10 @@ abstract contract StrategyJoeBase {
             _feeTreasury
         );
 
-        address _globe = IController(controller).globes(address(want));
-        require(_globe != address(0), "!globe"); // additional protection so we don't burn the funds
+        address globe = IController(controller).globes(address(want));
+        require (globe != address(0), "!globe"); // additional protection so we don't burn the funds
 
-        IERC20(want).safeTransfer(_globe, _amount.sub(_feeDev).sub(_feeTreasury));
+        IERC20(want).safeTransfer(globe, _amount.sub(_feeDev).sub(_feeTreasury));
     }
 
     // Withdraw funds, used to swap between strategies
@@ -1600,7 +1645,6 @@ abstract contract StrategyJoeBase {
         );
     }
         
-
     function _takeFeeJoeToSnob(uint256 _keep) internal {
         address[] memory path = new address[](3);
         path[0] = joe;
@@ -1662,7 +1706,7 @@ abstract contract StrategyJoeBase {
 // File contracts/interfaces/istablejoestaking.sol
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.7;
+// pragma solidity ^0.6.7;
 
 interface IStableJoeStaking {
     function deposit(uint256 _amount) external;
@@ -1676,10 +1720,8 @@ interface IStableJoeStaking {
 
 // File contracts/strategies/strategy-joe-staking-rewards-base.sol
 
-pragma solidity ^0.6.7;
+// pragma solidity ^0.6.7;
 
-
-//import "hardhat/console.sol";
 
 // Base contract for SNX Staking staking contract interfaces
 
@@ -1690,8 +1732,8 @@ abstract contract StrategyJoeStakingRewardsBase is StrategyJoeBase {
     // **** Getters ****
     constructor(
         address _staking,
-        address _want,
         address _reward,
+        address _want,
         address _governance,
         address _strategist,
         address _controller,
@@ -1705,18 +1747,18 @@ abstract contract StrategyJoeStakingRewardsBase is StrategyJoeBase {
     }
 
     function balanceOfPool() public override view returns (uint256) {
-        (uint256 amount,) = IStableJoeStaking(staking).getUserInfo(address(this), want);
+        (uint256 amount,) = IStableJoeStaking(staking).getUserInfo(address(this), reward);
         return amount;
     }
 
     function getHarvestable() external view returns (uint256) {
-        IStableJoeStaking(staking).updateReward(reward);
         return IStableJoeStaking(staking).pendingReward(address(this), reward);
     }
 
     // **** Setters ****
 
     function deposit() public override {
+        IStableJoeStaking(staking).updateReward(reward);
         uint256 _want = IERC20(want).balanceOf(address(this));
         if (_want > 0) {
             IERC20(want).safeApprove(staking, 0);
@@ -1730,6 +1772,7 @@ abstract contract StrategyJoeStakingRewardsBase is StrategyJoeBase {
         override
         returns (uint256)
     {
+        IStableJoeStaking(staking).updateReward(reward);
         IStableJoeStaking(staking).withdraw(_amount);
         return _amount;
     }
@@ -1739,14 +1782,14 @@ abstract contract StrategyJoeStakingRewardsBase is StrategyJoeBase {
 // File contracts/strategies/traderJoe/strategy-joe-sjoe.sol
 
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.6.7;
+// pragma solidity ^0.6.7;
 
 
 /// @title JOE-sJOE Staking Strategy
 /// @notice Staking rewards strategy for TraderJoe's sJoe pool with USDC rewards
 contract StrategyJoeSjoe is StrategyJoeStakingRewardsBase {
     // LP and Token addresses
-    address public sjoe = 0x1a731B2299E22FbAC282E7094EdA41046343Cb51; // Proxy contract for stableJoe
+    address public sjoe = 0x1a731B2299E22FbAC282E7094EdA41046343Cb51;               // Proxy contract for stableJoe
     address public usdc = 0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E;
     
     constructor(
@@ -1758,8 +1801,8 @@ contract StrategyJoeSjoe is StrategyJoeStakingRewardsBase {
         public
         StrategyJoeStakingRewardsBase(
             sjoe,
-            joe,
             usdc,
+            joe,
             _governance,
             _strategist,
             _controller,
@@ -1788,29 +1831,35 @@ contract StrategyJoeSjoe is StrategyJoeStakingRewardsBase {
         );
     }
 
-    /// @notice Collect token fees, swap USDC to JOE, stake JOE into sJOE
+    /**
+     * @notice Harvests the rewards from the sJoe staking contract and reinvests 
+     */
     function harvest() public override onlyBenevolent {
-        // Collect Joe tokens
+        // Calls deposit to trigger a harvest of the rewards
+        IStableJoeStaking(sjoe).updateReward(usdc);
         IStableJoeStaking(sjoe).deposit(0);
+
+        // Wraps native AVAX 
+        uint256 _avax = address(this).balance;                          // get balance of native Avax
+        if (_avax > 0) {                                                // wrap avax into ERC20
+            WAVAX(wavax).deposit{value: _avax}();
+        }
+
         // Get balance of USDC and collect reward fees
         uint256 _usdc = IERC20(usdc).balanceOf(address(this));
+
         if (_usdc > 0) {
             uint256 _keep = _usdc.mul(keep).div(keepMax);
             if (_keep > 0){
                 _takeFeeUsdcToSnob(_keep);
             }
-            
             _usdc = IERC20(usdc).balanceOf(address(this));
-        }
 
-        // In the case of USDC Rewards, swap USDC for JOE
-        if(_usdc > 0){    
-            IERC20(usdc).safeApprove(joeRouter, 0);
-            IERC20(usdc).safeApprove(joeRouter, _usdc);
+            // Swap usdc for joe
             _swapTraderJoe(usdc, joe, _usdc);
         }
 
-        // Check balances and donate dust to the treasury
+        // Donates dust to the treasury
         _usdc = IERC20(usdc).balanceOf(address(this));
         if (_usdc > 0){
             IERC20(usdc).safeTransfer(

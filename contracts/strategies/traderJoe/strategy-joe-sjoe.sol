@@ -8,7 +8,7 @@ import "../../interfaces/istablejoestaking.sol";
 /// @notice Staking rewards strategy for TraderJoe's sJoe pool with USDC rewards
 contract StrategyJoeSjoe is StrategyJoeStakingRewardsBase {
     // LP and Token addresses
-    address public sjoe = 0x1a731B2299E22FbAC282E7094EdA41046343Cb51; // Proxy contract for stableJoe
+    address public sjoe = 0x1a731B2299E22FbAC282E7094EdA41046343Cb51;               // Proxy contract for stableJoe
     address public usdc = 0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E;
     
     constructor(
@@ -20,8 +20,8 @@ contract StrategyJoeSjoe is StrategyJoeStakingRewardsBase {
         public
         StrategyJoeStakingRewardsBase(
             sjoe,
-            joe,
             usdc,
+            joe,
             _governance,
             _strategist,
             _controller,
@@ -50,29 +50,35 @@ contract StrategyJoeSjoe is StrategyJoeStakingRewardsBase {
         );
     }
 
-    /// @notice Collect token fees, swap USDC to JOE, stake JOE into sJOE
+    /**
+     * @notice Harvests the rewards from the sJoe staking contract and reinvests 
+     */
     function harvest() public override onlyBenevolent {
-        // Collect Joe tokens
+        // Calls deposit to trigger a harvest of the rewards
+        IStableJoeStaking(sjoe).updateReward(usdc);
         IStableJoeStaking(sjoe).deposit(0);
+
+        // Wraps native AVAX 
+        uint256 _avax = address(this).balance;                          // get balance of native Avax
+        if (_avax > 0) {                                                // wrap avax into ERC20
+            WAVAX(wavax).deposit{value: _avax}();
+        }
+
         // Get balance of USDC and collect reward fees
         uint256 _usdc = IERC20(usdc).balanceOf(address(this));
+
         if (_usdc > 0) {
             uint256 _keep = _usdc.mul(keep).div(keepMax);
             if (_keep > 0){
                 _takeFeeUsdcToSnob(_keep);
             }
-            
             _usdc = IERC20(usdc).balanceOf(address(this));
-        }
 
-        // In the case of USDC Rewards, swap USDC for JOE
-        if(_usdc > 0){    
-            IERC20(usdc).safeApprove(joeRouter, 0);
-            IERC20(usdc).safeApprove(joeRouter, _usdc);
+            // Swap usdc for joe
             _swapTraderJoe(usdc, joe, _usdc);
         }
 
-        // Check balances and donate dust to the treasury
+        // Donates dust to the treasury
         _usdc = IERC20(usdc).balanceOf(address(this));
         if (_usdc > 0){
             IERC20(usdc).safeTransfer(

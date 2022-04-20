@@ -9,6 +9,7 @@ import "../interfaces/staking-rewards.sol";
 import "../interfaces/icequeen.sol";
 import "../interfaces/joe.sol";
 import "../interfaces/controller.sol";
+import "../interfaces/wavax.sol";
 
 // Strategy Contract Basics
 

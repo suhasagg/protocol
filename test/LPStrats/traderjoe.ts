@@ -205,12 +205,18 @@ const tests = [
     //     name: "JoeUsdcJoe",
     //     controller: "traderJoe",
     //     slot: 1
-    // },
+    // // },
     // {
     //     name: "JoeAvaxLost",
     //     controller: "traderJoe",
     //     slot: 1
-    // }
+    // },
+    {
+        name: "JoeSjoe",
+        controller: "backup",
+        timelockIsStrategist: true,
+        slot: 0
+    }
 ];
 
 describe("TraderJoe LP test", function() {
